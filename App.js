@@ -31,24 +31,39 @@ app.get("/characters/:id", (req, res) => {
   }
 });
 
+// add a character
+app.post("characters", (req, res) => {
+  const { name, realName, universe } = req.body;
+
+  if (!name || !realName || !universe) {
+    return res.status(400).json({ message: "All fiels is required" });
+  }
+
+  const newCharacter = { name, realName, universe };
+  marvelData.push(newCharacter);
+
+  res.status(201).json({
+    message: "character added successfully",
+    character: newCharacter,
+  });
+});
+
+// modify a character
 app.put("/characters/:id", (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { name, realName, universe } = req.body;
 
-    // Chercher le personnage par ID
     const character = marvelData.characters.find((item) => item.id === id);
 
     if (!character) {
       return res.status(404).json({ message: "Character not found" });
     }
 
-    // Modifier seulement les champs envoyés
     if (name) character.name = name;
     if (realName) character.realName = realName;
     if (universe) character.universe = universe;
 
-    // Répondre avec le personnage mis à jour
     res.status(200).json({
       message: "Character updated successfully",
       character,
