@@ -1,4 +1,5 @@
 const express = require("express");
+const fs = require("fs");
 const app = express();
 const port = 3000;
 const marvelData = require("./characters.json");
@@ -32,15 +33,17 @@ app.get("/characters/:id", (req, res) => {
 });
 
 // add a character
-app.post("characters", (req, res) => {
+app.post("/characters", (req, res) => {
   const { name, realName, universe } = req.body;
 
   if (!name || !realName || !universe) {
-    return res.status(400).json({ message: "All fiels is required" });
+    return res.status(400).json({ message: "All fields are required" });
   }
 
   const newCharacter = { name, realName, universe };
-  marvelData.push(newCharacter);
+  marvelData = JSON.parse(fs.readFileSync(marvelData, "utf8"));
+  marvelData.characters.push(newCharacter);
+  fs.writeFileSync(marvelData, JSON.stringify(marvelData, null, 2));
 
   res.status(201).json({
     message: "character added successfully",
